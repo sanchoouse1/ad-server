@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy_db.db import get_async_session
 from sqlalchemy_db.models import Ad
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.schemas import AdOut, AdDetailOut, AdCreate
+from src.schemas import AdOut, AdDetailOut, AdCreate, BaseResponse
 
 router = APIRouter()
 
@@ -53,7 +53,7 @@ async def create_ad(
 async def delete_ad(
     ad_id: str,
     session: AsyncSession = Depends(get_async_session)
-) -> dict[int, str | int]:
+) -> BaseResponse:
     ad = await session.get(Ad, ad_id)
 
     if not ad:

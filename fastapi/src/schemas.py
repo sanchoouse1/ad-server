@@ -2,6 +2,10 @@ from pydantic import BaseModel
 from uuid import uuid4
 from sqlalchemy_db.models import AdType, UserType
 
+class BaseResponse(BaseModel):
+    status_code: int
+    detail: str
+
 class CommentOut(BaseModel):
     id: str
     text: str
