@@ -1,6 +1,3 @@
-# alembic revision --autogenerate
-# Накатываем все изменения из миграции на БД: alembic upgrade 45c26fdfa500 или head
-# alembic downgrade base (откатывает бд целиком к первоначальному состоянию)
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -8,7 +5,6 @@ from sqlalchemy import pool
 
 from alembic import context
 from src.config import settings
-# TODO:
 from sqlalchemy_db.models import User
 from sqlalchemy_db.db import Base
 
