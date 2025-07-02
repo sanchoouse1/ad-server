@@ -49,7 +49,7 @@ async def create_ad(
     await session.refresh(ad)
 
 
-@router.delete("/{ad_id}")
+@router.delete("/{ad_id}", summary="Удаление объявления")
 async def delete_ad(
     ad_id: str,
     session: AsyncSession = Depends(get_async_session)
