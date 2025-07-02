@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy_db.db import get_async_session
 from sqlalchemy_db.models import User, UserType
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.schemas import UserFormData
+from src.schemas import UserFormData, BaseResponse
 
 router = APIRouter()
 
@@ -60,3 +60,23 @@ async def login_user(
             return existing_user.id
         else:
             raise HTTPException(status_code=400, detail="Неверно введён логин или пароль")
+
+
+@router.patch("/create-admin/{user_id}", summary="Назначить администратора")
+async def create_admin(
+    user_id: str,
+    request: Request,
+    session: AsyncSession = Depends(get_async_session)
+) -> BaseResponse:
+    current_admin_id = request.cookies.get('user_id')
+    current_admin = await session.get(User, current_admin_id)
+    if not current_admin or current_admin.role != UserType.ADMIN:
+        raise HTTPException(status_code=403, detail="Недостаточно прав")
+    
+    user = await session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    
+    user.role = UserType.ADMIN
+    await session.commit()
+    return {"status_code": 200, "detail": "Запрос выполнен успешно"}
