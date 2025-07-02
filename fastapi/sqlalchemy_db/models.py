@@ -1,8 +1,13 @@
 from sqlalchemy import String, Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_db.db import Base
-from uuid import UUID, uuid4
 import enum
+import shortuuid
+
+
+def generate_shortuuid() -> str:
+    return shortuuid.uuid()
+
 
 class UserType(str, enum.Enum):
     ADMIN = "admin"
@@ -12,7 +17,7 @@ class UserType(str, enum.Enum):
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    id: Mapped[str] = mapped_column(String(22), primary_key=True, default=generate_shortuuid)
     email: Mapped[str] = mapped_column(String, unique=True, nullable=False, index=True)
     hashed_password: Mapped[str]
     role: Mapped[UserType] = mapped_column(default=UserType.USER)
@@ -29,7 +34,7 @@ class AdType(str, enum.Enum):
 class Ad(Base):
     __tablename__ = "ads"
 
-    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    id: Mapped[str] = mapped_column(String(22), primary_key=True, default=generate_shortuuid)
     title: Mapped[str] = mapped_column(String, index=True)
     description: Mapped[str] = mapped_column(Text)
     type: Mapped[AdType] = mapped_column(default=AdType.SALE)
@@ -42,7 +47,7 @@ class Ad(Base):
 class Comment(Base):
     __tablename__ = "comments"
 
-    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    id: Mapped[str] = mapped_column(String(22), primary_key=True, default=generate_shortuuid)
     text: Mapped[str] = mapped_column(Text)
     author_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     ad_id: Mapped[int] = mapped_column(ForeignKey("ads.id", ondelete="CASCADE"))
