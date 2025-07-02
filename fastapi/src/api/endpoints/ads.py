@@ -38,7 +38,7 @@ async def get_ad_detail(
     return ad
 
 
-@router.post("/", sumarry="Разместить объявление")
+@router.post("/", summary="Разместить объявление")
 async def create_ad(
     data: AdCreate,
     session: AsyncSession = Depends(get_async_session)
