@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, HTTPException, Response
+from sqlalchemy import select
 from sqlalchemy_db.db import get_async_session
 from sqlalchemy_db.models import User
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,6 +14,11 @@ async def register_user(
     data: UserFormData,
     session: AsyncSession = Depends(get_async_session)
 ) -> str:
+    result = await session.execute(select(User).where(User.email == data.email))
+    existing_user = result.scalar_one_or_none()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Данная почта уже используется")
+
     new_user = User(
         email=data.email,
         hashed_password=data.hashed_password
@@ -26,6 +32,10 @@ async def register_user(
     return new_user.id
 
 
-@router.post("/login")
-async def login_user():
+@router.post("/login", summary="Вход в систему")
+async def login_user(
+    response: Response,
+    data: UserFormData,
+    session: AsyncSession = Depends(get_async_session)
+):
     pass
