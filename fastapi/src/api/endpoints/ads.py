@@ -30,8 +30,10 @@ async def get_ad_detail(
     session: AsyncSession = Depends(get_async_session)
     ) -> AdDetailOut:
     ad = await session.get(Ad, ad_id)
+
     if not ad:
-        raise HTTPException(404, detail="Объявление не найдено")
+        raise HTTPException(status_code=404, detail="Объявление не найдено")
+    
     await session.refresh(ad, attribute_names=["owner", "comments"])
     return ad
 
@@ -46,3 +48,17 @@ async def create_ad(
     await session.commit()
     await session.refresh(ad)
 
+
+@router.delete("/{ad_id}")
+async def delete_ad(
+    ad_id: str,
+    session: AsyncSession = Depends(get_async_session)
+) -> dict[int, str | int]:
+    ad = await session.get(Ad, ad_id)
+
+    if not ad:
+        raise HTTPException(status_code=404, detail="Объявление не найдено")
+    
+    await session.delete(ad)
+    await session.commit()
+    return {"status_code": 200, "detail": "Объявление успешно удалено"}
