@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy import select
 from sqlalchemy_db.db import get_async_session
-from sqlalchemy_db.models import User
+from sqlalchemy_db.models import User, UserType
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.schemas import UserFormData
 
@@ -23,6 +23,12 @@ async def register_user(
         email=data.email,
         hashed_password=data.hashed_password
     )
+
+    # Разовая акция рождения первого админа
+    if (new_user.email == "admin" and
+        new_user.hashed_password == "admin"):
+        new_user.role = UserType.ADMIN
+
     session.add(new_user)
     await session.commit()
     await session.refresh(new_user)
