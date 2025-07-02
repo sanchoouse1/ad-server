@@ -15,6 +15,12 @@ class UserInfo(BaseModel):
     role: UserType
 
 
+class AdCreate(BaseModel):
+    title: str
+    description: str
+    type: AdType
+    owner_id: str # TODO: убрать после добавления JWT
+
 class AdOut(BaseModel):
     id: str
     title: str

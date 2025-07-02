@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy_db.db import get_async_session
 from sqlalchemy_db.models import Ad
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.schemas import AdOut, AdDetailOut
+from src.schemas import AdOut, AdDetailOut, AdCreate
 
 router = APIRouter()
 
@@ -34,3 +34,15 @@ async def get_ad_detail(
         raise HTTPException(404, detail="Объявление не найдено")
     await session.refresh(ad, attribute_names=["owner", "comments"])
     return ad
+
+
+@router.post("/", sumarry="Разместить объявление")
+async def create_ad(
+    data: AdCreate,
+    session: AsyncSession = Depends(get_async_session)
+    ) -> str:
+    ad = Ad(**data.model_dump())
+    session.add(ad)
+    await session.commit()
+    await session.refresh(ad)
+
