@@ -38,7 +38,7 @@ class Ad(Base):
     title: Mapped[str] = mapped_column(String, index=True)
     description: Mapped[str] = mapped_column(Text)
     type: Mapped[AdType] = mapped_column(default=AdType.SALE)
-    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    owner_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
 
     owner: Mapped["User"] = relationship(back_populates="ads")
     comments: Mapped[list["Comment"]] = relationship(back_populates="ad")
@@ -49,8 +49,8 @@ class Comment(Base):
 
     id: Mapped[str] = mapped_column(String(22), primary_key=True, default=generate_shortuuid)
     text: Mapped[str] = mapped_column(Text)
-    author_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-    ad_id: Mapped[int] = mapped_column(ForeignKey("ads.id", ondelete="CASCADE"))
+    author_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    ad_id: Mapped[str] = mapped_column(ForeignKey("ads.id", ondelete="CASCADE"))
 
     author: Mapped["User"] = relationship(back_populates="comments")
     ad: Mapped["Ad"] = relationship(back_populates="comments")
