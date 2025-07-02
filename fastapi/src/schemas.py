@@ -18,6 +18,10 @@ class UserInfo(BaseModel):
     email: str
     role: UserType
 
+class UserFormData(BaseModel):
+    email: str
+    hashed_password: str
+
 
 class AdCreate(BaseModel):
     title: str
