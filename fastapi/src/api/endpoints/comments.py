@@ -8,7 +8,7 @@ from src.services.auth import get_current_user
 router = APIRouter()
 
 
-@router.post("/{ad_id}", summary="Добавить комментарий к объявлению", response_model=CommentOut)
+@router.post("/{ad_id}", summary="Добавить комментарий к объявлению")
 async def add_comment(
     ad_id: str,
     data: CommentCreate,
@@ -26,7 +26,7 @@ async def add_comment(
     return comment.text
 
 
-@router.delete("/{comment_id}", summary="Удалить комментарий", response_model=BaseResponse)
+@router.delete("/{comment_id}", summary="Удалить комментарий")
 async def delete_comment(
     comment_id: str,
     current_user: User = Depends(get_current_user),

@@ -46,9 +46,3 @@ class AdDetailOut(BaseModel):
 
 class CommentCreate(BaseModel):
     text: str
-
-class CommentOut(BaseModel):
-    id: str
-    text: str
-    author_id: str
-    ad_id: str
