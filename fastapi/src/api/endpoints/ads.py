@@ -70,12 +70,15 @@ async def create_ad(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_session)
 ) -> str:
-    ad = Ad(**data.model_dump(), owner_id=current_user.id)
-    session.add(ad)
-    await session.commit()
-    await session.refresh(ad)
+    try:
+        ad = Ad(**data.model_dump(), owner_id=current_user.id)
+        session.add(ad)
+        await session.commit()
+        await session.refresh(ad)
 
-    return ad.id
+        return ad.id
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Ошибка при создании объявления")
 
 
 @router.delete("/{ad_id}", summary="Удаление объявления")

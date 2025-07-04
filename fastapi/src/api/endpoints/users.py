@@ -62,13 +62,16 @@ async def create_admin(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_session)
 ) -> BaseResponse:
-    if not current_user.role != UserType.ADMIN:
+    if current_user.role != UserType.ADMIN:
         raise HTTPException(status_code=403, detail="Недостаточно прав")
 
     user = await session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
 
-    user.role = UserType.ADMIN
-    await session.commit()
-    return {"status_code": 200, "detail": "Запрос выполнен успешно"}
+    try:
+        user.role = UserType.ADMIN
+        await session.commit()
+        return {"status_code": 200, "detail": "Пользователь назначен администратором"}
+    except:
+        raise HTTPException(status_code=500, detail="Ошибка при обновлении пользователя")

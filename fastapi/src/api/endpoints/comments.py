@@ -39,6 +39,9 @@ async def delete_comment(
     if not comment:
         raise HTTPException(404, detail="Комментарий не найден")
 
-    await session.delete(comment)
-    await session.commit()
-    return {"status_code": 200, "detail": "Комментарий удалён"}
+    try:
+        await session.delete(comment)
+        await session.commit()
+        return {"status_code": 200, "detail": "Комментарий удалён"}
+    except:
+        raise HTTPException(status_code=500, detail="Ошибка при удалении комментария")
