@@ -49,8 +49,8 @@ async def login_user(
     user_id = request.cookies.get('user_id')
     if not user_id:
         raise HTTPException(status_code=403, detail="Вход запрещен. Проверьте корректность полей или зарегистрируйте новый аккаунт")
-    
-    result = await session.execute(select(User).where(User.id == data.user_id))
+
+    result = await session.execute(select(User).where(User.id == user_id))
     existing_user = result.scalar_one_or_none()
     if existing_user:
         if (existing_user.hashed_password == data.hashed_password and
@@ -72,11 +72,11 @@ async def create_admin(
     current_admin = await session.get(User, current_admin_id)
     if not current_admin or current_admin.role != UserType.ADMIN:
         raise HTTPException(status_code=403, detail="Недостаточно прав")
-    
+
     user = await session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
-    
+
     user.role = UserType.ADMIN
     await session.commit()
     return {"status_code": 200, "detail": "Запрос выполнен успешно"}

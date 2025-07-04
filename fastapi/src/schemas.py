@@ -42,3 +42,13 @@ class AdDetailOut(BaseModel):
     type: AdType
     owner: UserInfo
     comments: list[CommentOut]
+
+
+class CommentCreate(BaseModel):
+    text: str
+
+class CommentOut(BaseModel):
+    id: str
+    text: str
+    author_id: str
+    ad_id: str
