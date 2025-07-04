@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import select, and_
 from sqlalchemy_db.db import get_async_session
-from sqlalchemy_db.models import Ad, User
+from sqlalchemy_db.models import Ad, User, AdType
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.schemas import AdOut, AdDetailOut, AdCreate, BaseResponse
 from src.services.auth import get_current_user
@@ -11,6 +11,31 @@ router = APIRouter()
 @router.get("/", summary="Просмотр списка объявлений")
 async def get_list_ads(session: AsyncSession = Depends(get_async_session)) -> list[AdOut]:
     result = await session.execute(select(Ad))
+    return result.scalars().all()
+
+
+@router.get("/filter", summary="Фильтрация объявлений")
+async def filter_ads(
+    title: str | None = Query(default=None, description="Фильтр по заголовку"),
+    type: AdType | None = Query(default=None, description="Тип объявления (sale, service, purchase)"),
+    owner_id: str | None = Query(default=None, description="Фильтр по ID владельца"),
+    session: AsyncSession = Depends(get_async_session),
+) -> list[AdOut]:
+    filters = []
+    print(title)
+    if title:
+        filters.append(Ad.title.ilike(f"%{title}%"))
+    if type:
+        filters.append(Ad.type == type)
+    if owner_id:
+        filters.append(Ad.owner_id == owner_id)
+
+    print(filters)
+    query = select(Ad)
+    if filters:
+        query = query.where(and_(*filters))
+
+    result = await session.execute(query)
     return result.scalars().all()
 
 
