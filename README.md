@@ -2,8 +2,12 @@ _Задание выполнено в срок (до 9:30 05.07)_
 [openapi.json](https://github.com/sanchoouse1/ad-server/blob/master/openapi.json)
 
 # Выбранный стек технологий
+Использовано согласно ТЗ:
+
 Бэкенд: FastAPI
+
 СУБД Postgres (_версия 15_), SQLAlchemy + Alembic
+
 python 3.12
 
 # Как развернуть проект
