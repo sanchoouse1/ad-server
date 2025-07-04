@@ -1,0 +1,6 @@
+fastapi[all]
+uvicorn
+sqlalchemy
+asyncpg
+alembic
+shortuuid
