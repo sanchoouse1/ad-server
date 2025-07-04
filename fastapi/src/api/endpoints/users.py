@@ -4,6 +4,7 @@ from sqlalchemy_db.db import get_async_session
 from sqlalchemy_db.models import User, UserType
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.schemas import UserFormData, BaseResponse
+from fastapi.security import OAuth2PasswordRequestForm
 from src.services.auth import get_current_user, create_access_token
 
 router = APIRouter()
@@ -40,12 +41,12 @@ async def register_user(
 
 @router.post("/login", summary="Вход в систему")
 async def login_user(
-    data: UserFormData,
+    form_data: OAuth2PasswordRequestForm = Depends(),
     session: AsyncSession = Depends(get_async_session)
-) -> str:
-    result = await session.execute(select(User).where(User.email == data.email))
+) -> dict:
+    result = await session.execute(select(User).where(User.email == form_data.username))
     existing_user = result.scalar_one_or_none()
-    if not existing_user or existing_user.hashed_password != data.hashed_password:
+    if not existing_user or existing_user.hashed_password != form_data.password:
         raise HTTPException(
             status_code=401,
             detail="Неверный логин или пароль",
