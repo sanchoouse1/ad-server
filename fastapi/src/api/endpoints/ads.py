@@ -4,6 +4,7 @@ from sqlalchemy_db.db import get_async_session
 from sqlalchemy_db.models import Ad, User
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.schemas import AdOut, AdDetailOut, AdCreate, BaseResponse
+from src.services.auth import get_current_user
 
 router = APIRouter()
 
@@ -40,19 +41,11 @@ async def get_ad_detail(
 
 @router.post("/", summary="Разместить объявление")
 async def create_ad(
-    request: Request,
     data: AdCreate,
+    current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_session)
 ) -> str:
-    owner_id = request.cookies.get('user_id')
-    if not owner_id:
-        raise HTTPException(status_code=403, detail="Вы не авторизованы, войдите в систему")
-
-    user = await session.get(User, owner_id)
-    if not user:
-        raise HTTPException(status_code=403, detail="Пользователь не найден")
-
-    ad = Ad(**data.model_dump(), owner_id=owner_id)
+    ad = Ad(**data.model_dump(), owner_id=current_user.id)
     session.add(ad)
     await session.commit()
     await session.refresh(ad)
@@ -62,20 +55,16 @@ async def create_ad(
 
 @router.delete("/{ad_id}", summary="Удаление объявления")
 async def delete_ad(
-    request: Request,
     ad_id: str,
+    current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_session)
 ) -> BaseResponse:
-    owner_id = request.cookies.get('user_id')
-    if not owner_id:
-        raise HTTPException(status_code=403, detail="Вы не авторизованы, войдите в систему")
-
     ad = await session.get(Ad, ad_id)
 
     if not ad:
         raise HTTPException(status_code=404, detail="Объявление не найдено")
 
-    if ad.owner_id != owner_id:
+    if ad.owner_id != current_user.id:
         raise HTTPException(status_code=403, detail="Вы не можете удалить это объявление")
 
     await session.delete(ad)
