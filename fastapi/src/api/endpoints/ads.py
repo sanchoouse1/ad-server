@@ -33,7 +33,7 @@ async def get_ad_detail(
 
     if not ad:
         raise HTTPException(status_code=404, detail="Объявление не найдено")
-    
+
     await session.refresh(ad, attribute_names=["owner", "comments"])
     return ad
 
@@ -47,7 +47,7 @@ async def create_ad(
     owner_id = request.cookies.get('user_id')
     if not owner_id:
         raise HTTPException(status_code=403, detail="Вы не авторизованы, войдите в систему")
-    
+
     user = await session.get(User, owner_id)
     if not user:
         raise HTTPException(status_code=403, detail="Пользователь не найден")
@@ -56,6 +56,8 @@ async def create_ad(
     session.add(ad)
     await session.commit()
     await session.refresh(ad)
+
+    return ad.id
 
 
 @router.delete("/{ad_id}", summary="Удаление объявления")
@@ -67,7 +69,7 @@ async def delete_ad(
     owner_id = request.cookies.get('user_id')
     if not owner_id:
         raise HTTPException(status_code=403, detail="Вы не авторизованы, войдите в систему")
-    
+
     ad = await session.get(Ad, ad_id)
 
     if not ad:
